@@ -1,0 +1,7 @@
+{
+  "name": "ai-rag",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix backend run dev"
+  }
+}
