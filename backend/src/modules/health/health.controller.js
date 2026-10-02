@@ -1,12 +1,26 @@
-//The response is used here as globally so we didn't write the api response structure again !
-const {SendSuccess } = require ("../../core/utils/response.js")
+const { db, redis, storage } = require("../../config");
+const { sendSuccess } = require("../../core/utils/response");
 
-const getHealth = (req, res)=>{
-    return SendSuccess(res ,{
-        message :"The AI-Devloper tools is working fine !" , 
-        statsu :" 200" 
+const getHealth = async (req, res, next) => {
+    try {
+    await db.checkDatabaseConnection();
+    await redis.redis.checkRedisConnection();
+    await storage.checkStorageConnection();
+
+    return sendSuccess(     res, {
+        service: "AI Developer Platform API",
+        status: "healthy",
+        infrastructure: {
+        database: "connected",
+        redis: "connected",
+        storage: "connected"
+    }
     });
+} catch (error) {
+    next(error);
+}
 };
 
-
-module.exports = getHealth;
+module.exports = {
+getHealth
+};
