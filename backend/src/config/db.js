@@ -1,21 +1,16 @@
-const { Pool } = require("pg");
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL
-});
-
-const checkDatabaseConnection = async () => {
-    const client = await pool.connect();
-
-    try{
-        await client.query("SELECT 1")
-    } finally {
-        client.release()
-    }
+const checkDatabaseConnection = async () =>{
+    await prisma.$queryRaw`SELECT 1`;
 };
 
-module.exports ={
-    pool ,
-    checkDatabaseConnection
+const disconnectDatabase = async () =>{
+    await prisma.$disconnect();
 };
 
+module.export = {
+    prisma ,
+    checkDatabaseConnection,
+    disconnectDatabase
+};

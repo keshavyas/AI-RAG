@@ -1,21 +1,27 @@
 const app = require("./app");
+const { env, db } = require("./config");
+const logger = require("./core/utils/logger");
 
-const env = require("./src/config/env.js");
-const logger = require("./src/core/utils/Logger.js");
-
-const server = app.listen(env.PORT, () => {
-    logger.info(
-    `AI Developer Platform API running on port ${env.PORT}`
-);
+const server = app.listen(env.port, () => {
+  logger.info(`AI Developer Platform API running on port ${env.port}`);
 });
 
-const shutdown = (signal) => {
+const shutdown = async (signal) => {
   logger.info(`${signal} received. Shutting down server...`);
 
-  server.close(() => {
-    logger.info("Server closed.");
+  server.close(async () => {
+    try {
+      await db.disconnectDatabase();
+      logger.info("Database connection closed.");
+      logger.info("Server closed.");
+      process.exit(0);
+    } catch (error) {
+      logger.error("Error during shutdown", {
+        message: error.message
+      });
 
-    process.exit(0);
+      process.exit(1);
+    }
   });
 };
 
